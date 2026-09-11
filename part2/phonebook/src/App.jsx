@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
@@ -10,6 +12,17 @@ const App = () => {
   const [newFilter, setNewFilter] = useState('')
 
   let personsToShow = persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
+
+  useEffect(() => {
+    console.log('effect')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('data recieved')
+        setPersons(response.data)
+      })
+  }, [])
+  console.log('total persons ' + persons.length)
 
   const addPhoneBook = (e) => {
     e.preventDefault();
@@ -26,12 +39,14 @@ const App = () => {
 
     const personObj = {
       name: newName,
-      number: newNumber
+      number: newNumber,
+      id: persons.length+1
     }
 
     setPersons(persons.concat(personObj))
     setNewName('')
     setNewNumber('')
+    console.log(personObj)
   }
 
   const handleNameChange = (e) => setNewName(e.target.value)
@@ -41,7 +56,7 @@ const App = () => {
   return (
     <>
       <h2>Phonebook</h2>
-
+      
       <Filter 
         newFilter={newFilter}
         handleFilterChange={handleFilterChange}
