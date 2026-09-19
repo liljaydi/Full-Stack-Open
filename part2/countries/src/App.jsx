@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 
 import Country from './components/Country'
+import CountriesList from './components/CountriesList'
 
 const App = () => {
   const [countries, setCountries] = useState(null)
@@ -12,6 +13,7 @@ const App = () => {
   const handleCountryChange = e => {
     setNewCountry(e.target.value)
     console.log(e.target.value)
+    setCountry(null)
 
     if (e.target.value === '') {
       setCountries(null)
@@ -19,6 +21,9 @@ const App = () => {
       setTooManyMatches(false)
     }
   }
+
+  const handleCountryShow = (clickedCountry) => 
+    setCountry(clickedCountry)
 
   useEffect(() => {
     if (newCountry !== '') {
@@ -46,7 +51,7 @@ const App = () => {
           setTooManyMatches(false)
 
           console.log('found 1 country')
-        } 
+        }
         
         console.log(matchedCountries.map(matchedCountry => matchedCountry.name.common))
       })
@@ -73,12 +78,19 @@ const App = () => {
   if (!countries) {
     console.log('no request')
     countryToDisplay = null
+
   } else if (tooManyMatches) {
     countryToDisplay = <p>Too many matches, specify another filter</p>
+  
   } else if (countries.length > 1) {
-    countryToDisplay = countries.map(country => <p key={country}>{country}</p>)
+    countryToDisplay = <CountriesList 
+      countries={countries}
+      handleCountryShow={handleCountryShow}
+    />
+  
   } else if (countries.length === 1) {
     countryToDisplay = <Country country={countries[0]}/>
+  
   } else {
     console.log('no country found')
     countryToDisplay = ''
