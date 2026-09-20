@@ -4,11 +4,17 @@ import axios from 'axios'
 import Country from './components/Country'
 import CountriesList from './components/CountriesList'
 
+const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
+console.log(apiKey)
+
 const App = () => {
   const [countries, setCountries] = useState(null)
   const [country, setCountry] = useState(null)
+  const [weather, setWeather] = useState(null)
+
   const [newCountry, setNewCountry] = useState('')
   const [tooManyMatches, setTooManyMatches] = useState(false)
+  const [coordinate, setCoordinate] = useState(null)
 
   const handleCountryChange = e => {
     setNewCountry(e.target.value)
@@ -19,6 +25,7 @@ const App = () => {
       setCountries(null)
       setCountry(null)
       setTooManyMatches(false)
+      setWeather(null)
     }
   }
 
@@ -33,6 +40,7 @@ const App = () => {
       .get(`https://studies.cs.helsinki.fi/restcountries/api/all`)
       .then(response => {
         setCountries([])
+        setWeather(null)
         const countries = response.data
 
         console.log('data recieved')
@@ -68,10 +76,30 @@ const App = () => {
           const returnedCountry = response.data
           setCountries([returnedCountry])
 
+          setCoordinate({
+            lat: returnedCountry.capitalInfo.latlng[0],
+            lon: returnedCountry.capitalInfo.latlng[1]
+          })
+
           console.log(returnedCountry)
         })
     }
   }, [country])
+
+  useEffect(() => {
+    if (coordinate) {
+      console.log('requesting weather')
+
+      const { lat, lon } = coordinate
+
+      axios
+        .get(`https://api.openweathermap.org/data/4.0/onecall/current?lat=${lat}&lon=${lon}&appid=${apiKey}`)
+        .then(response => {
+          const returnedWeather = response.data
+          console.log(returnedWeather)
+        })
+    }
+  }, [coordinate])
 
   let countryToDisplay
 
@@ -89,7 +117,10 @@ const App = () => {
     />
   
   } else if (countries.length === 1) {
-    countryToDisplay = <Country country={countries[0]}/>
+    countryToDisplay = <Country 
+      country={countries[0]}
+      weather={weather}
+    />
   
   } else {
     console.log('no country found')

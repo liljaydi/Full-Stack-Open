@@ -1,4 +1,4 @@
-const Country = ({ country }) => {
+const Country = ({ country, weather }) => {
     console.log('rendering country')
 
     const languages = Object.values(country.languages)
@@ -16,6 +16,12 @@ const Country = ({ country }) => {
             </ul>
 
             <img src={country.flags.png} alt={country.flags.alt} />
+            {weather
+                ? <div>
+                    <h2>Weather in {country.name.common}</h2>
+                </div>
+                : null
+            }
         </>
     )
 }
