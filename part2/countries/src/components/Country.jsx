@@ -1,6 +1,11 @@
 const Country = ({ country, weather }) => {
     console.log('rendering country')
 
+    if (weather) {
+        console.log(`temp: ${weather.temp}`)
+        console.log(`wind: ${weather.wind}`)
+    }
+
     const languages = Object.values(country.languages)
     console.log(languages)
 
@@ -19,6 +24,12 @@ const Country = ({ country, weather }) => {
             {weather
                 ? <div>
                     <h2>Weather in {country.name.common}</h2>
+                    <p>Temperature {weather.temp} Celcius</p>
+                    <img 
+                        src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`} 
+                        alt="weather icon"
+                    />
+                    <p>Wind {weather.wind}</p>
                 </div>
                 : null
             }

@@ -14,12 +14,10 @@ const App = () => {
 
   const [newCountry, setNewCountry] = useState('')
   const [tooManyMatches, setTooManyMatches] = useState(false)
-  const [coordinate, setCoordinate] = useState(null)
 
   const handleCountryChange = e => {
     setNewCountry(e.target.value)
     console.log(e.target.value)
-    setCountry(null)
 
     if (e.target.value === '') {
       setCountries(null)
@@ -41,6 +39,8 @@ const App = () => {
       .then(response => {
         setCountries([])
         setWeather(null)
+        setCountry(null)
+        setTooManyMatches(false)
         const countries = response.data
 
         console.log('data recieved')
@@ -52,11 +52,9 @@ const App = () => {
 
         } else if (matchedCountries.length > 1) {
           setCountries(matchedCountries.map(matchedCountry => matchedCountry.name.common))
-          setTooManyMatches(false)
 
         } else if (matchedCountries.length === 1) {
           setCountry(matchedCountries[0].name.common)
-          setTooManyMatches(false)
 
           console.log('found 1 country')
         }
@@ -76,30 +74,30 @@ const App = () => {
           const returnedCountry = response.data
           setCountries([returnedCountry])
 
-          setCoordinate({
-            lat: returnedCountry.capitalInfo.latlng[0],
-            lon: returnedCountry.capitalInfo.latlng[1]
-          })
+          requestWeather(returnedCountry.capitalInfo.latlng[0],
+            returnedCountry.capitalInfo.latlng[1])
 
           console.log(returnedCountry)
         })
     }
   }, [country])
 
-  useEffect(() => {
-    if (coordinate) {
-      console.log('requesting weather')
+  function requestWeather(lat, lon) {
+    console.log('requesting weather')
 
-      const { lat, lon } = coordinate
+    axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`)
+      .then(response => {
+        const returnedWeather = response.data
+        console.log(returnedWeather)
 
-      axios
-        .get(`https://api.openweathermap.org/data/4.0/onecall/current?lat=${lat}&lon=${lon}&appid=${apiKey}`)
-        .then(response => {
-          const returnedWeather = response.data
-          console.log(returnedWeather)
+        setWeather({
+          temp: returnedWeather.main.temp - 273.15,
+          wind: returnedWeather.wind.speed,
+          icon: returnedWeather.weather[0].icon
         })
-    }
-  }, [coordinate])
+      })
+  }
 
   let countryToDisplay
 
