@@ -10,6 +10,7 @@ morgan.token('body', (request) => {
 })
 
 app.use(morgan(':body'))
+app.use(express.static('dist'))
 
 let persons = [
     { 
