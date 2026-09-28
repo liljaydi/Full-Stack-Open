@@ -1,3 +1,3 @@
 # Phonebook Backend
 
-Online application: https://phonebook-dahh.onrender.com/api/persons
+Online application: https://phonebook-dahh.onrender.com
