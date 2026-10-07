@@ -1,10 +1,13 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
 const app = express()
 
 app.use(express.json())
 app.use(morgan('tiny'))
 
+// this part is a middleware for logging request in the console
 morgan.token('body', (request) => {
   return JSON.stringify(request.body)
 })
@@ -36,7 +39,9 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-  response.json(persons)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 app.get('/info', (request, response) => {
@@ -83,6 +88,7 @@ app.post('/api/persons', (request, response) => {
     })
   }
 
+  /*
   const duplicate = persons.find(person => person.name === body.name)
 
   if (duplicate) {
@@ -90,15 +96,16 @@ app.post('/api/persons', (request, response) => {
       error: 'name must be unique'
     })
   }
+  */
 
-  const person = {
-    id: String(Math.floor(Math.random() * 1000000)),
+  const person = new Person({
     name: body.name,
-    number: body.number 
-  }
+    number: body.number
+  })
 
-  persons = persons.concat(person)
-  response.json(person)
+  person.save().then(savedPerson => {
+    response.json(savedPerson)
+  })
 })
 
 const PORT = process.env.PORT || 3001
