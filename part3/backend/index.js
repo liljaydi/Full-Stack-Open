@@ -68,9 +68,14 @@ app.get('/api/notes/:id', (request, response, next) => {
 app.delete('/api/notes/:id', (request, response, next) => {
   Note.findByIdAndDelete(request.params.id)
     .then(result => {
+      console.log(result)
       response.status(204).end()
     })
-    .catch(error => next(error))
+    .catch(error => {
+      console.log('error catch, A')
+      next(error)
+      console.log('error catch, B')
+    })
 })
 
 const PORT = process.env.PORT
@@ -86,13 +91,16 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
+  console.log('error handler, C')
   console.error(error.message)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } 
 
+  console.log('error handler, D')
   next(error)
+  console.log('error handler, E')
 }
 
 // this has to be the last loaded middleware, also all the routes should be registered before this!
