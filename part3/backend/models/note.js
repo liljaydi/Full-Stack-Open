@@ -1,3 +1,4 @@
+require("node:dns/promises").setServers(["1.1.1.1", "8.8.8.8"]);
 const mongoose = require('mongoose')
 
 mongoose.set('strictQuery', false)
@@ -15,7 +16,11 @@ mongoose.connect(url, { family: 4 })
   })
 
 const noteSchema = new mongoose.Schema({
-  content: String,
+  content: {
+    type: String,
+    minLength: 5,
+    required: true
+  },
   important: Boolean,
 })
 

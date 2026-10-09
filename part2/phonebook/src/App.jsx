@@ -5,6 +5,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import Notification from './components/Notification'
+import ErrorNotification from './components/ErrorNotification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,6 +13,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
   const [notificationMessage, setNotificationMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const personsToShow = persons.filter(person => 
     person.name.toLowerCase().includes(newFilter.toLowerCase()))
@@ -63,6 +65,12 @@ const App = () => {
       setTimeout(() => {
         setNotificationMessage('')
       }, 5000)  
+    }).catch(error => {
+      console.log(error.response.data.error)
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage('')
+      }, 10000)  
     })
   }
 
@@ -87,6 +95,15 @@ const App = () => {
       }, 5000)
     })
     .catch(error => {
+      if (error.response.data.name === 'validation error') {
+        console.log(error.response.data.error)
+        setErrorMessage(error.response.data.error)
+        setTimeout(() => {
+          setErrorMessage('')
+        }, 10000)
+        return
+      }
+
       setNotificationMessage(`
         Information of ${person.name} has already been removed from server
       `)
@@ -122,6 +139,11 @@ const App = () => {
 
       {notificationMessage !== ''
         ? <Notification notificationMessage={notificationMessage}/>
+        : <></>
+      }
+
+      {errorMessage !== ''
+        ? <ErrorNotification errorMessage={errorMessage}/>
         : <></>
       }
       

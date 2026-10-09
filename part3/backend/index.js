@@ -6,7 +6,7 @@ const Note = require('./models/note')
 app.use(express.json())
 app.use(express.static('dist'))
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
   console.log('post route is running')
   const body = request.body
 
@@ -23,7 +23,7 @@ app.post('/api/notes', (request, response) => {
 
   note.save().then(savedNote => {
     response.json(savedNote)
-  })
+  }).catch(error => next(error))
 })
 
 app.put('/api/notes/:id', (request, response, next) => {
@@ -71,11 +71,7 @@ app.delete('/api/notes/:id', (request, response, next) => {
       console.log(result)
       response.status(204).end()
     })
-    .catch(error => {
-      console.log('error catch, A')
-      next(error)
-      console.log('error catch, B')
-    })
+    .catch(error => next(error))
 })
 
 const PORT = process.env.PORT
@@ -91,16 +87,15 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-  console.log('error handler, C')
   console.error(error.message)
 
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
 
-  console.log('error handler, D')
   next(error)
-  console.log('error handler, E')
 }
 
 // this has to be the last loaded middleware, also all the routes should be registered before this!

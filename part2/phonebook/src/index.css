@@ -6,3 +6,12 @@
     border: 2px solid green;
     margin-bottom: 10px;
 }
+
+.error-notification {
+    color: red;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgb(255, 230, 217);
+    border: 2px solid red;
+    margin-bottom: 10px;
+}
