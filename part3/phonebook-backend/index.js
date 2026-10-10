@@ -30,8 +30,8 @@ app.get('/info', (request, response) => {
         <p>Phonebook has info for ${count} people</p>
         <p>${time}</p>
       </div>
-    `) 
-  }) 
+    `)
+  })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -67,8 +67,8 @@ app.put('/api/persons/:id', (request, response, next) => {
 
   Person.findByIdAndUpdate(
     id, newPerson, {
-      returnDocument: 'after', 
-      runValidators: true 
+      returnDocument: 'after',
+      runValidators: true
     }
   ).then(result => {
     if (result) response.json(result)
@@ -93,7 +93,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'Invalid id' })
   } else if (error.name === 'ValidationError') {
-    return response.status(404).send({ 
+    return response.status(404).send({
       error: error.message,
       name: 'validation error'
     })

@@ -11,8 +11,8 @@ app.post('/api/notes', (request, response, next) => {
   const body = request.body
 
   if (!body.content) {
-    return response.status(400).json({ 
-      error: 'content missing' 
+    return response.status(400).json({
+      error: 'content missing'
     })
   }
 
@@ -60,7 +60,7 @@ app.get('/api/notes/:id', (request, response, next) => {
     if (note) response.json(note)
     else response.status(404).end()
     // no matching id/object
-  }).catch(error => next(error)) 
+  }).catch(error => next(error))
   // findMyId method rejected
   // next(error) continues to the middleware error handler
 })
