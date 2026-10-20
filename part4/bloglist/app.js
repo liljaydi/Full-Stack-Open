@@ -15,6 +15,7 @@ const { info } = require('./utils/logger')
 const app = express()
 
 //connection to database
+console.log('connecting to MongoDB')
 mongoose.connect(MONGODB_URI, { family: 4 })
 .then(() => {
   info('connected to MongoDB')
