@@ -1,7 +1,7 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const favoriteBlog = require('../utils/list_helper').favoriteBlog
-const { oneBlog, multipleBlogs, mostLikeBlog } = require('./test_helper')
+const { oneBlog, blogs, mostLikeBlog } = require('./test_helper')
 
 describe('most like blog', () => {
   test('of empty list is null', () => {
@@ -13,6 +13,6 @@ describe('most like blog', () => {
   })
 
   test('of a bigger list returns the correct blog', () => {
-    assert.deepStrictEqual(favoriteBlog(multipleBlogs), mostLikeBlog)
+    assert.deepStrictEqual(favoriteBlog(blogs), mostLikeBlog)
   })
 })

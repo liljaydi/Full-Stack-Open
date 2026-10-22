@@ -1,7 +1,7 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
 const { mostBlog, mostLike } = require('../utils/list_helper')
-const { oneBlog, multipleBlogs } = require('./test_helper')
+const { oneBlog, blogs } = require('./test_helper')
 
 // This test checks the author with the most blogs post
 
@@ -18,7 +18,7 @@ describe('author with the most blog', () => {
   })
 
   test('when there is multiple blogs is the correct author', () => {
-    assert.deepStrictEqual(mostBlog(multipleBlogs), {
+    assert.deepStrictEqual(mostBlog(blogs), {
       author: "Robert C. Martin",
       blogs: 3
     })
@@ -40,7 +40,7 @@ describe('author with the most Like', () => {
   })
 
   test('when there is multiple blogs is the correct blog', () => {
-    assert.deepStrictEqual(mostLike(multipleBlogs), {
+    assert.deepStrictEqual(mostLike(blogs), {
       author: 'Edsger W. Dijkstra',
       likes: 12
     })

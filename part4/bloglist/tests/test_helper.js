@@ -1,3 +1,12 @@
+const Blog = require('../models/blog')
+
+// request all data helper
+
+const blogsInDb = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(blog => blog.toJSON())
+}
+
 // This are the data needed for every test
 
 const oneBlog = [
@@ -11,7 +20,7 @@ const oneBlog = [
   }
 ]
 
-const multipleBlogs = [
+const blogs = [
   {
     _id: "5a422a851b54a676234d17f7",
     title: "React patterns",
@@ -72,7 +81,8 @@ const mostLikeBlog = {
 }
 
 module.exports = {
+  blogsInDb,
   oneBlog,
-  multipleBlogs,
+  blogs,
   mostLikeBlog
 }
