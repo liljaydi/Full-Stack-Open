@@ -22,6 +22,12 @@ test('notes are returned as json and correct count', async () => {
   assert.strictEqual(response.body.length, blogs.length)
 })
 
+test('notes have id property not _id', async () => {
+  const response = await api.get('/api/blogs')
+  assert.ok('id' in response.body[0])
+  assert.ok(!('_id' in response.body[0]))
+})
+
 after(async () => {
   await mongoose.connection.close()
 })

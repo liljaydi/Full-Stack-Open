@@ -1,3 +1,5 @@
+// This are the data needed for every test
+
 const oneBlog = [
   {
     _id: '5a422aa71b54a676234d17f8',
