@@ -1,7 +1,12 @@
 const { test, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
-const { blogsInDb, blogs } = require('./test_helper')
+const { 
+  blogsInDb, 
+  blogs, 
+  newBlog, 
+  blogWithNoId 
+} = require('./test_helper')
 const app = require('../app')
 const supertest = require('supertest')
 const Blog = require('../models/blog')
@@ -29,13 +34,6 @@ test('blog have id property not _id', async () => {
 })
 
 test('blog is added in database (increased count and correct data)', async () => {
-  const newBlog = {
-    title: "ang ligid, ang tiil, and shark (ay shark), ang kanding",
-    author: "ante",
-    url: "facebook.com",
-    likes: 4000000
-  }
-
   const savedBlog = await api
     .post('/api/blogs')
     .send(newBlog)
@@ -45,9 +43,21 @@ test('blog is added in database (increased count and correct data)', async () =>
   assert.strictEqual(blogsAtEnd.length, blogs.length + 1)
 
   const returnedBlog = blogsAtEnd.find(blog => 
-    blog.title === "ang ligid, ang tiil, and shark (ay shark), ang kanding"
+    blog.id === savedBlog.body.id
   )
   assert.deepStrictEqual(savedBlog.body, returnedBlog);
+})
+
+test('blog with no id property should default to 0', async () => {
+  const savedBlog = await api
+    .post('/api/blogs')
+    .send(blogWithNoId)
+
+  assert.deepStrictEqual(savedBlog.body, {
+    ...blogWithNoId,
+    id: savedBlog.body.id,
+    likes: 0
+  })
 })
 
 after(async () => {

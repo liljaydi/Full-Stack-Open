@@ -1,25 +1,12 @@
 const Blog = require('../models/blog')
 
-// request all data helper
-
+// request all data from database (helper)
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
 }
 
-// This are the data needed for every test
-
-const oneBlog = [
-  {
-    _id: '5a422aa71b54a676234d17f8',
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
-    likes: 5,
-    __v: 0
-  }
-]
-
+// This are the data needed for some test
 const blogs = [
   {
     _id: "5a422a851b54a676234d17f7",
@@ -71,18 +58,31 @@ const blogs = [
   }  
 ]
 
-const mostLikeBlog = {
-  _id: "5a422b3a1b54a676234d17f9",
-  title: "Canonical string reduction",
-  author: "Edsger W. Dijkstra",
-  url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
-  likes: 12,
-  __v: 0
+// this data is used from a method that assumes every parameter passed is an array 
+// hence we have to declare it as an array
+const oneBlog = [blogs[1]]
+
+// used only for object comparison
+const mostLikeBlog = blogs[2]
+
+const newBlog = {
+  title: "ang ligid, ang tiil, and shark (ay shark), ang kanding",
+  author: "ante",
+  url: "facebook.com",
+  likes: 4000000
+}
+
+const blogWithNoId = {
+  title: "ang ligid, ang tiil, and shark (ay shark), ang kanding",
+  author: "ante",
+  url: "facebook.com"
 }
 
 module.exports = {
   blogsInDb,
   oneBlog,
   blogs,
-  mostLikeBlog
+  mostLikeBlog,
+  newBlog,
+  blogWithNoId
 }
