@@ -11,6 +11,7 @@ const totalLikes = (blogs) => {
   return blogs.reduce(reducer, 0)
 }
 
+// finds the most liked blog
 const favoriteBlog = (blogs) => {
   const reducer = (favoriteBlog, blog) => {
     return blog.likes > favoriteBlog.likes
@@ -76,6 +77,7 @@ const mostBlog = (blogs) => {
   return authors.reduce(getMostBlog, authors[0])
 }
 
+// finds the author that has the most liked blog
 const mostLike = (blogs) => {
   const reducer = (mostLike, blog) => {
     return blog.likes > mostLike.likes
