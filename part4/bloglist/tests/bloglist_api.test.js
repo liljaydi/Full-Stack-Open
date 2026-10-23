@@ -5,7 +5,8 @@ const {
   blogsInDb, 
   blogs, 
   newBlog, 
-  blogWithNoId 
+  blogWithNoId,
+  blogWithNoTitleAndUrl
 } = require('./test_helper')
 const app = require('../app')
 const supertest = require('supertest')
@@ -58,6 +59,13 @@ test('blog with no id property should default to 0', async () => {
     id: savedBlog.body.id,
     likes: 0
   })
+})
+
+test('request with no title or url is responded with status 400', async () => {
+  const savedBlog = await api
+    .post('/api/blogs')
+    .send(blogWithNoTitleAndUrl)
+    .expect(400)
 })
 
 after(async () => {

@@ -78,11 +78,17 @@ const blogWithNoId = {
   url: "facebook.com"
 }
 
+const blogWithNoTitleAndUrl = {
+  author: "ante",
+  likes: 4000000
+}
+
 module.exports = {
   blogsInDb,
   oneBlog,
   blogs,
   mostLikeBlog,
   newBlog,
-  blogWithNoId
+  blogWithNoId,
+  blogWithNoTitleAndUrl
 }
