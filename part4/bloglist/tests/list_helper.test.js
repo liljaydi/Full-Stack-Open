@@ -1,7 +1,55 @@
 const { test, describe } = require('node:test')
 const assert = require('node:assert')
-const { mostBlog, mostLike } = require('../utils/list_helper')
-const { oneBlog, blogs } = require('./test_helper')
+
+// list helper functions from utils
+const { 
+  dummy,
+  totalLikes,
+  favoriteBlog,
+  mostBlog,
+  mostLike
+} = require('../utils/list_helper')
+
+// test data
+const { 
+  oneBlog,
+  blogs,
+  mostLikeBlog
+} = require('./test_helper')
+
+test('dummy returns one', () => {
+  const blogs = []
+  const result = dummy(blogs)
+  assert.strictEqual(result, 1)
+})
+
+describe('total likes', () => {
+  test('of empty list is zero', () => {
+    assert.strictEqual(totalLikes([]), 0)
+  })
+
+  test('when list has only one blog equals the likes of that', () => {
+    assert.strictEqual(totalLikes(oneBlog), 5)
+  })
+
+  test('of a bigger list is calculated right', () => {
+    assert.strictEqual(totalLikes(blogs), 36)
+  })
+})
+
+describe('most like blog', () => {
+  test('of empty list is null', () => {
+    assert.strictEqual(favoriteBlog([]), null)
+  })
+
+  test('when list has only one blog is that blog', () => {
+    assert.deepStrictEqual(favoriteBlog(oneBlog), oneBlog[0])
+  })
+
+  test('of a bigger list returns the correct blog', () => {
+    assert.deepStrictEqual(favoriteBlog(blogs), mostLikeBlog)
+  })
+})
 
 // This test checks the author with the most blogs post
 describe('author with the most blog', () => {
