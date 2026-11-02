@@ -1,22 +1,39 @@
 const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
+
+// test data
 const { 
   blogsInDb, 
   blogs, 
   newBlog, 
-  blogWithNoId,
-  blogWithNoTitleAndUrl
+  blogWithNoLikes,
+  blogWithNoTitleAndUrl,
+  users,
+  userWithNoPassword,
+  userWithInvalidPassword,
+  existingUsername,
+  userWithNoUsername
 } = require('./test_helper')
-const app = require('../app')
-const supertest = require('supertest')
-const Blog = require('../models/blog')
 
+// app module is all of the backend functionality
+// except that it is not listening to a port
+const app = require('../app')
+// for test integration
+const supertest = require('supertest')
+
+// let supertest handles the request
 const api = supertest(app)
+
+// models
+const Blog = require('../models/blog')
+const User = require('../models/user')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(blogs)
+  await User.deleteMany({})
+  await User.insertMany(users)
 })
 
 describe('blogs are returned', () => {
@@ -55,10 +72,10 @@ describe('adding blog in database', () => {
   test('with no likes property is automatically added and set value to 0', async () => {
     const savedBlog = await api
       .post('/api/blogs')
-      .send(blogWithNoId)
+      .send(blogWithNoLikes)
 
     assert.deepStrictEqual(savedBlog.body, {
-      ...blogWithNoId,
+      ...blogWithNoLikes,
       id: savedBlog.body.id,
       likes: 0
     })
@@ -73,7 +90,9 @@ describe('adding blog in database', () => {
 })
 
 test('a blog can be deleted', async () => {
-  const blogId = blogs[0]._id
+  const blog = await Blog.findOne({ author: "Michael Chan" })
+  const blogId = blog.id
+
   await api
     .delete(`/api/blogs/${blogId}`)
     .expect(204)
@@ -83,21 +102,63 @@ test('a blog can be deleted', async () => {
 })
 
 test('a blog can be updated', async () => {
-  const blogId = blogs[0]._id
+  const blog = await Blog.findOne({ author: "Michael Chan" })
+  const blogId = blog.id
+
+  // change likes from 7 to 14
   const updatedBlog = await api
     .patch(`/api/blogs/${blogId}`)
     .send({ likes: 14 })
 
-  // this destructuring is for getting properties from blogs[0] except _id and __v
-  // ...rest gets the remaining properties
-  const { _id, __v, ...rest } = blogs[0]
+  const { likes, ...rest } = blogs[0]
   assert.deepStrictEqual(updatedBlog.body, {
-    // since updatedBlog is returned with id property not _id
-    // we need to remove _id property to compare, hence use ...rest
-    // updatedBlog also doesnt include __v
     ...rest,
-    id: _id,
+    id: updatedBlog.body.id,
     likes: 14
+  })
+})
+
+describe('adding users in database', () => {
+  test('with no password returns an error', async () => {
+    const addedUser = await api
+      .post('/api/users')
+      .send(userWithNoPassword)
+      .expect(400)
+
+    assert.deepStrictEqual(addedUser.body, { error: 'password is required' })
+  })
+
+  test('with invalid password returns an error', async () => {
+    const addedUser = await api
+      .post('/api/users')
+      .send(userWithInvalidPassword)
+      .expect(400)
+
+    assert.deepStrictEqual(addedUser.body, { 
+      error: 'password must be atleast 3 characters long' 
+    })
+  })
+
+  test('with existing username returns an error', async () => {
+    const savedUser = await api
+      .post('/api/users')
+      .send(existingUsername)
+      .expect(400)
+
+    assert.deepStrictEqual(savedUser.body, {
+      error: 'expected `username` to be unique' 
+    })
+  })
+
+  test('with no username returns an error', async () => {
+    const savedUser = await api
+      .post('/api/users')
+      .send(userWithNoUsername)
+      .expect(400)
+
+    assert.deepStrictEqual(savedUser.body, {
+      error: 'User validation failed: username: Path `username` is required.'
+    })
   })
 })
 
