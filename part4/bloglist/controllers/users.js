@@ -1,18 +1,12 @@
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
 
 /*
   {
     "username": "jaydi",
     "name": "gyde",
     "password": "gyde123"
-  }
-  {
-    "username": "johndoe11",
-    "name": "John Doe",
-    "password": "johndoe123"
   }
 */
 
@@ -43,7 +37,12 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-  const returnedUsers = await User.find({})
+  const returnedUsers = await User
+    .find({})
+    .populate('blogs', { 
+      title: 1, author: 1, url: 1, likes: 1
+    })
+  
   response.json(returnedUsers)
 })
 

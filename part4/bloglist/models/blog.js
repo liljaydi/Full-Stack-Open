@@ -15,6 +15,10 @@ const blogSchema = mongoose.Schema({
     default: 0 
     // defaults like to 0 if no like property was sent from request
   },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 })
 
 blogSchema.set('toJSON', {
