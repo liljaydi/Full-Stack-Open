@@ -226,6 +226,15 @@ describe('adding users in database', () => {
   })
 })
 
+test('adding blog with no token is unauthorized', async () => {
+  const savedBlog = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+
+  assert.deepStrictEqual(savedBlog.body, { error: 'token missing' })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
