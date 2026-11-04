@@ -1,39 +1,88 @@
-const { test, after, beforeEach, describe } = require('node:test')
+// npm test --test tests/bloglist_api.test.js
+
+const { before, beforeEach, describe, test, after } = require('node:test')
 const assert = require('node:assert')
 const mongoose = require('mongoose')
 
-// test data
+// blog test data
 const { 
   blogsInDb, 
   blogs, 
   newBlog, 
   blogWithNoLikes,
-  blogWithNoTitleAndUrl,
-  users,
+  blogWithNoTitleAndUrl
+} = require('./blog_helper')
+
+// user test data
+const { 
+  gydeUserData, 
+  jhonDoeUserData,
   userWithNoPassword,
   userWithInvalidPassword,
   existingUsername,
   userWithNoUsername
-} = require('./test_helper')
+} = require('./user_helper')
 
 // app module is all of the backend functionality
 // except that it is not listening to a port
 const app = require('../app')
+
 // for test integration
 const supertest = require('supertest')
 
-// let supertest handles the request
+// lets supertest handles the request
 const api = supertest(app)
 
 // models
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+// global variable
+let gydeLogin
+let jhonDoeLogin
+
+before(async () => {
+  await User.deleteMany({})
+
+  // register a user in database
+  const gydeAccount = await api.post('/api/users').send(gydeUserData).expect(201)
+  const jhonDoeAccount = await api.post('/api/users').send(jhonDoeUserData).expect(201)
+
+  // get user credential before logging in
+  const { name: gyde, ...gydeCredentials } = gydeUserData
+  const { name: jhonDoe, ...jhonDoeCredentials } = jhonDoeUserData
+
+  // login gyde account
+  gydeLogin = await api
+    .post('/api/login')
+    .send({ ...gydeCredentials })
+    .expect(200)
+
+  // login jhon doe account
+  jhonDoeLogin = await api
+    .post('/api/login')
+    .send({ ...jhonDoeCredentials })
+    .expect(200)
+  
+  // add id inside login's since login request 
+  // does not return the id of the user
+  gydeLogin = { ...gydeLogin.body, id: gydeAccount.body.id }
+  jhonDoeLogin = { ...jhonDoeLogin.body, id: jhonDoeAccount.body.id }
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({})
-  await Blog.insertMany(blogs)
-  await User.deleteMany({})
-  await User.insertMany(users)
+
+  // replace initial user property value with the actual id
+  const blogsWithUserIds = blogs.map(blog => ({
+    ...blog,
+    user: blog.user === 'gyde'
+      ? gydeLogin.id
+      : jhonDoeLogin.id
+    })
+  )
+
+  await Blog.insertMany(blogsWithUserIds)
 })
 
 describe('blogs are returned', () => {
@@ -58,6 +107,7 @@ describe('adding blog in database', () => {
     const savedBlog = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `Bearer ${gydeLogin.token}`)
       .expect(201)
 
     const blogsAtEnd = await blogsInDb()
@@ -66,35 +116,48 @@ describe('adding blog in database', () => {
     const returnedBlog = blogsAtEnd.find(blog => 
       blog.id === savedBlog.body.id
     )
-    assert.deepStrictEqual(savedBlog.body, returnedBlog);
+
+    // NB: toJSON() is not the same as json serialization
+    // response.json(savedBlog) returns a serialized data
+    // while blog.toJSON() returns a plain JS object using Mongoose's toJSON configuration.
+    // so data from request (with .json()) !== data that is proccesed with toJSON()
+
+    assert.deepStrictEqual(savedBlog.body, returnedBlog)
   })
 
+  // npm test -- --test-name-pattern="with no likes property is automatically added and set value to 0"
   test('with no likes property is automatically added and set value to 0', async () => {
     const savedBlog = await api
       .post('/api/blogs')
       .send(blogWithNoLikes)
+      .set('Authorization', `Bearer ${gydeLogin.token}`)
 
     assert.deepStrictEqual(savedBlog.body, {
       ...blogWithNoLikes,
       id: savedBlog.body.id,
-      likes: 0
+      likes: 0,
+      user: gydeLogin.id
     })
   })
 
+  // npm test -- --test-name-pattern="with no title or url is responded with status 400"
   test('with no title or url is responded with status 400', async () => {
     const savedBlog = await api
       .post('/api/blogs')
       .send(blogWithNoTitleAndUrl)
+      .set('Authorization', `Bearer ${gydeLogin.token}`)
       .expect(400)
   })
 })
 
+// npm test -- --test-name-pattern="a blog can be deleted"
 test('a blog can be deleted', async () => {
-  const blog = await Blog.findOne({ author: "Michael Chan" })
+  const blog = await Blog.findOne({ title: "React patterns" })
   const blogId = blog.id
 
   await api
     .delete(`/api/blogs/${blogId}`)
+    .set('Authorization', `Bearer ${gydeLogin.token}`)
     .expect(204)
 
   const blogsAtEnd = await blogsInDb()
@@ -102,7 +165,7 @@ test('a blog can be deleted', async () => {
 })
 
 test('a blog can be updated', async () => {
-  const blog = await Blog.findOne({ author: "Michael Chan" })
+  const blog = await Blog.findOne({ title: "React patterns" })
   const blogId = blog.id
 
   // change likes from 7 to 14
@@ -110,11 +173,12 @@ test('a blog can be updated', async () => {
     .patch(`/api/blogs/${blogId}`)
     .send({ likes: 14 })
 
-  const { likes, ...rest } = blogs[0]
+  const { likes, user, ...rest } = blogs[0]
   assert.deepStrictEqual(updatedBlog.body, {
     ...rest,
     id: updatedBlog.body.id,
-    likes: 14
+    likes: 14,
+    user: gydeLogin.id
   })
 })
 

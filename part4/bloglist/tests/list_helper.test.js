@@ -15,7 +15,7 @@ const {
   oneBlog,
   blogs,
   mostLikeBlog
-} = require('./test_helper')
+} = require('./blog_helper')
 
 test('dummy returns one', () => {
   const blogs = []

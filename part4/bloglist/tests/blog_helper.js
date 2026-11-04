@@ -3,7 +3,8 @@ const Blog = require('../models/blog')
 // request all data from database (helper)
 const blogsInDb = async () => {
   const blogs = await Blog.find({})
-  return blogs.map(blog => blog.toJSON())
+  // serialize data first then parse into a js object
+  return blogs.map(blog => JSON.parse(JSON.stringify(blog)))
 }
 
 // This are the data needed for some test
@@ -13,36 +14,42 @@ const blogs = [
     author: "Michael Chan",
     url: "https://reactpatterns.com/",
     likes: 7,
+    user: "gyde"
   },
   {
     title: "Go To Statement Considered Harmful",
     author: "Edsger W. Dijkstra",
     url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
     likes: 5,
+    user: "gyde"
   },
   {
     title: "Canonical string reduction",
     author: "Edsger W. Dijkstra",
     url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
     likes: 12,
+    user: "gyde"
   },
   {
     title: "First class tests",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
     likes: 10,
+    user: "jhondoe"
   },
   {
     title: "TDD harms architecture",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
     likes: 0,
+    user: "jhondoe"
   },
   {
     title: "Type wars",
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
     likes: 2,
+    user: "jhondoe"
   }  
 ]
 
@@ -71,41 +78,6 @@ const blogWithNoTitleAndUrl = {
   likes: 4000000
 }
 
-const users = [
-  {
-    username: 'jaydi',
-    name: 'gyde',
-    passwordHash: '$2b$10$4t/lLMLLIE.8n5Zd6LKVkeUJAOD9E8kt1vC4giazf/kOw.V3XOB/W'
-  },
-  {
-    username: 'Jane@123',
-    name: 'Jane tae',
-    passwordHash: '$2b$10$NX5N4SJm2F1sSWq05O3HY.jw0HpFMZ7O4Fs4uEDKNWIcP3Szh542.'
-  }
-]
-
-const userWithNoPassword = {
-  username: 'johndoe11',
-  name: 'John Doe'
-}
-
-const userWithInvalidPassword = {
-  username: 'johndoe11',
-  name: 'John Doe',
-  password: 'jo'
-}
-
-const existingUsername = {
-  username: 'jaydi',
-  name: 'jjaydi',
-  password: 'gyde123483y5thu'
-}
-
-const userWithNoUsername = {
-  name: 'John Doe',
-  password: 'John Doe'
-}
-
 module.exports = {
   blogsInDb,
   oneBlog,
@@ -114,9 +86,4 @@ module.exports = {
   newBlog,
   blogWithNoLikes,
   blogWithNoTitleAndUrl,
-  users,
-  userWithNoPassword,
-  userWithInvalidPassword,
-  existingUsername,
-  userWithNoUsername
 }
