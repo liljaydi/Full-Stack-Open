@@ -1,0 +1,7 @@
+# Create a Vite application
+npm create vite@latest
+- creates a new project folder and its files.
+
+# Initialize a Node.js project
+npm init
+- creates a package.json file in your current directory.

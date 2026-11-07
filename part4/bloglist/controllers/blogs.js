@@ -1,6 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const mongoose = require('mongoose')
 
 // middleware
 const userExtractor = require('../utils/middleware').userExtractor
