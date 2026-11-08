@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 // components
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 
 // services
 import loginService from './services/login'
@@ -25,14 +27,12 @@ const App = () => {
   const [ password, setPassword ] = useState('')
   const [ blogs, setBlogs ] = useState([])
 
-  // create new blog fields
-  const [ title, setTitle ] = useState('')
-  const [ author, setAuthor ] = useState('')
-  const [ url, setUrl ] = useState('')
-
   // notification state
   // value should be an object { message, isError }
   const [ notification, setNotification ] = useState(null)
+
+  // blogForm referrence
+  const blogFormRef = useRef()
 
   // request all blogs
   useEffect(() => {
@@ -73,12 +73,9 @@ const App = () => {
   }
 
   // add new blog
-  const addBlog = async event => {
-    event.preventDefault()
+  const addBlog = async blogProperties => {
     try {
-      const newBlog = await blogService.createBlog({
-        title, author, url
-      })
+      const newBlog = await blogService.createBlog(blogProperties)
 
       const newBlogs = [
         ...blogs,
@@ -90,14 +87,18 @@ const App = () => {
         `A new blog ${newBlog.title} by ${newBlog.author} added`, 
         false,
       )
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      blogFormRef.current.handleDisplay()
     } catch (error) {
-      notifyWith(error.response.data.error, true)
+      if (error.response.data.error) {
+        notifyWith(error.response.data.error, true)
+      } else {
+        notifyWith(error.message, true)
+      }
+      throw error
     }
   }
 
+  // handles notification functionality
   const notifyWith = (message, isError) => {
     setNotification({ 
       message: message, 
@@ -152,39 +153,11 @@ const App = () => {
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
       </div>
-      <div>
-        <h2>create new</h2>
-        <form onSubmit={addBlog}>
-          <div>
-            <label>
-              title:
-              <input 
-                value={title}
-                onChange={({ target }) => setTitle(target.value)}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              author:
-              <input 
-                value={author}
-                onChange={({ target }) => setAuthor(target.value)}
-              />
-            </label>
-          </div>
-          <div>
-            <label>
-              url:
-              <input 
-                value={url}
-                onChange={({ target }) => setUrl(target.value)}
-              />
-            </label>
-          </div>
-          <button type='submit'>create</button>
-        </form>
-      </div>
+
+      <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+        <BlogForm createBlog={addBlog}/>
+      </Togglable>
+
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
