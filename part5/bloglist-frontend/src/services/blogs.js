@@ -40,7 +40,7 @@ const deleteABlog = async blogId => {
   await axios.delete(`${baseUrl}/${blogId}`, config)
 }
 
-export default { 
+export default {
   getBlogs,
   setToken,
   createBlog,

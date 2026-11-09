@@ -12,11 +12,11 @@ const Togglable = ({ buttonLabel, children, ref }) => {
   })
 
   return (
-    display 
+    display
       ? <>
-          {children}
-          <button onClick={handleDisplay}>cancel</button>
-        </>
+        {children}
+        <button onClick={handleDisplay}>cancel</button>
+      </>
       : <button onClick={handleDisplay}>{buttonLabel}</button>
   )
 }

@@ -23,23 +23,23 @@ const Blog = ({ blog, handleLikes, userId, handleDelete }) => {
   return (
     view
       ? <div style={blogStyle}>
-          {blog.title} 
-          <button onClick={handleView}>hide</button><br/>
-          {blog.url}<br/>
-          {blog.likes}<button onClick={() => handleLikes(blog)}>like</button><br/>
-          {blog.author}<br/>
-          {userId === blog.user.id && 
-            <button 
-              style={removeButton}
-              onClick={() => handleDelete(blog)}
-            >
-              remove
-            </button>}
-        </div>
+        {blog.title}
+        <button onClick={handleView}>hide</button><br/>
+        {blog.url}<br/>
+        {blog.likes}<button onClick={() => handleLikes(blog)}>like</button><br/>
+        {blog.author}<br/>
+        {userId === blog.user.id &&
+          <button
+            style={removeButton}
+            onClick={() => handleDelete(blog)}
+          >
+            remove
+          </button>}
+      </div>
       : <div style={blogStyle}>
-          {blog.title} {blog.author}
-          <button onClick={handleView}>view</button>
-        </div>
+        {blog.title} {blog.author}
+        <button onClick={handleView}>view</button>
+      </div>
   )
 }
 export default Blog

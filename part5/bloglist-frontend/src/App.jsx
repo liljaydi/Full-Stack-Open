@@ -93,7 +93,7 @@ const App = () => {
       const sortedBlogs = sortBlogs(newBlogs)
       setBlogs(sortedBlogs)
       notifyWith(
-        `A new blog ${newBlog.title} by ${newBlog.author} added`, 
+        `A new blog ${newBlog.title} by ${newBlog.author} added`,
         false,
       )
       blogFormRef.current.handleDisplay()
@@ -108,9 +108,9 @@ const App = () => {
     const previousBlogState = blogs
     const updatedBlogs = blogs.map(blog => blog.id === blogToUpdate.id
       ? {
-          ...blogToUpdate,
-          likes: blogToUpdate.likes + 1
-        }
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1
+      }
       : blog
     )
     const sortedBlogs = sortBlogs(updatedBlogs)
@@ -151,8 +151,8 @@ const App = () => {
 
   // handles notification functionality
   const notifyWith = (message, isError) => {
-    setNotification({ 
-      message: message, 
+    setNotification({
+      message: message,
       // ?? -> if left value (isError) is null set value to false
       isError: isError ?? false
     })
@@ -172,8 +172,8 @@ const App = () => {
           <div>
             <label>
               username
-              <input 
-                value={username} 
+              <input
+                value={username}
                 onChange={({ target }) => setUsername(target.value)}
               />
             </label>
@@ -181,9 +181,9 @@ const App = () => {
           <div>
             <label>
               password
-              <input 
+              <input
                 type='password'
-                value={password} 
+                value={password}
                 onChange={({ target }) => setPassword(target.value)}
               />
             </label>
@@ -199,7 +199,7 @@ const App = () => {
       <h2>blogs</h2>
 
       {notification && <Notification notification={notification}/>}
-      
+
       <div>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
@@ -210,9 +210,9 @@ const App = () => {
       </Togglable>
 
       {blogs.map(blog =>
-        <Blog 
-          key={blog.id} 
-          blog={blog} 
+        <Blog
+          key={blog.id}
+          blog={blog}
           handleLikes={handleLikes}
           userId={user.id}
           handleDelete={handleDelete}

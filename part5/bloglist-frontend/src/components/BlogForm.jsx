@@ -1,4 +1,4 @@
-import { useState } from 'react' 
+import { useState } from 'react'
 
 const BlogForm = ({ createBlog }) => {
   // create new blog fields
@@ -16,6 +16,7 @@ const BlogForm = ({ createBlog }) => {
       setUrl('')
     } catch {
       // do nothing
+      // this here is to not clear form when failed to create new blog
     }
   }
 
@@ -26,7 +27,7 @@ const BlogForm = ({ createBlog }) => {
         <div>
           <label>
             title:
-            <input 
+            <input
               value={title}
               onChange={({ target }) => setTitle(target.value)}
             />
@@ -35,7 +36,7 @@ const BlogForm = ({ createBlog }) => {
         <div>
           <label>
             author:
-            <input 
+            <input
               value={author}
               onChange={({ target }) => setAuthor(target.value)}
             />
@@ -44,7 +45,7 @@ const BlogForm = ({ createBlog }) => {
         <div>
           <label>
             url:
-            <input 
+            <input
               value={url}
               onChange={({ target }) => setUrl(target.value)}
             />
