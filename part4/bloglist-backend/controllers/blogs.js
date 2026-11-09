@@ -23,12 +23,15 @@ blogsRouter.post('/', userExtractor, async (request, response) => {
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  response.status(201).json(savedBlog)
+  const populatedBlog = await savedBlog.populate('user', { username: 1, name: 1 })
+  response.status(201).json(populatedBlog)
 })
 
 blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   const blog = await Blog.findById(request.params.id)
 
+  // if logged in user id is not the same as blogs user id
+  // reject delete
   if (!(blog.user.toString() === request.user.id.toString())) {
     return response.status(403).json({
       error: "you are not authorized to delete this blog" 
@@ -39,7 +42,7 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   response.status(204).end()
 })
 
-blogsRouter.patch('/:id', async (request, response) => {
+blogsRouter.patch('/:id', userExtractor, async (request, response) => {
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id, request.body, {
       // returns the new data state

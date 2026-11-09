@@ -21,10 +21,12 @@ const tokenExtractor = (request, response, next) => {
 }
 
 const userExtractor = async (request, response, next) => {
+  // no token provided
   if (!request.token) {
     return response.status(401).json({ error: 'token missing' })
   }
 
+  // token is not valid or expired
   const token = jwt.verify(request.token, process.env.SECRET)
   if (!token.id) {
     return response.status(401).json({ error: "token invalid" })

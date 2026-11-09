@@ -34,12 +34,21 @@ const App = () => {
   // blogForm referrence
   const blogFormRef = useRef()
 
+  // sort blogs according to number of likes
+  const sortBlogs = blogs => {
+    // b.likes - a.likes = result
+    // if result is negative, right value comes first
+    // if result is positive, left value comes first
+    return blogs.sort((a, b) => b.likes - a.likes)
+  }
+
   // request all blogs
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
         const blogs = await blogService.getBlogs()
-        setBlogs(blogs)
+        const sortedBlogs = sortBlogs(blogs)
+        setBlogs(sortedBlogs)
       } catch {
         console.log('request blog failed')
       }
@@ -61,8 +70,7 @@ const App = () => {
 
       blogService.setToken(user.token)
     } catch (error) {
-      // error.response.data.error -> accesses backend error response
-      notifyWith(error.response.data.error, true)
+      handleErrorMessage(error)
     }
   }
 
@@ -82,19 +90,62 @@ const App = () => {
         newBlog
       ]
 
-      setBlogs(newBlogs)
+      const sortedBlogs = sortBlogs(newBlogs)
+      setBlogs(sortedBlogs)
       notifyWith(
         `A new blog ${newBlog.title} by ${newBlog.author} added`, 
         false,
       )
       blogFormRef.current.handleDisplay()
     } catch (error) {
-      if (error.response.data.error) {
-        notifyWith(error.response.data.error, true)
-      } else {
-        notifyWith(error.message, true)
-      }
+      handleErrorMessage(error)
       throw error
+    }
+  }
+
+  // update blogs likes
+  const handleLikes = async blogToUpdate => {
+    const previousBlogState = blogs
+    const updatedBlogs = blogs.map(blog => blog.id === blogToUpdate.id
+      ? {
+          ...blogToUpdate,
+          likes: blogToUpdate.likes + 1
+        }
+      : blog
+    )
+    const sortedBlogs = sortBlogs(updatedBlogs)
+    setBlogs(sortedBlogs)
+    try {
+      await blogService.updateLikes(blogToUpdate)
+    } catch (error) {
+      handleErrorMessage(error)
+      setBlogs(previousBlogState)
+    }
+  }
+
+  // delete a blog
+  const handleDelete = async blogToDelete => {
+    if (!window.confirm(
+      `remove blog ${blogToDelete.title} by ${blogToDelete.author}`
+    )) {
+      return
+    }
+
+    try {
+      await blogService.deleteABlog(blogToDelete.id)
+      const filteredBlogs = blogs.filter(blog => blog.id !== blogToDelete.id)
+      setBlogs(filteredBlogs)
+    } catch (error) {
+      handleErrorMessage(error)
+    }
+  }
+
+  // handle error message to be sent with notification
+  const handleErrorMessage = error => {
+    if (error.response.data.error) {
+      notifyWith(error.response.data.error, true)
+    } else {
+      notifyWith(error.message, true)
     }
   }
 
@@ -159,7 +210,13 @@ const App = () => {
       </Togglable>
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog 
+          key={blog.id} 
+          blog={blog} 
+          handleLikes={handleLikes}
+          userId={user.id}
+          handleDelete={handleDelete}
+        />
       )}
     </div>
   )
